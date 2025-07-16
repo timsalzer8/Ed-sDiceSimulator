@@ -1,0 +1,18 @@
+﻿# Build-Ordner
+bin/
+obj/
+
+# User-spezifische Dateien
+*.user
+*.suo
+
+# Visual Studio-Projektmüll
+.vs/
+*.cache
+*.dbmdl
+
+# Paket-Verzeichnisse
+packages/
+
+# Sonstiges
+*.log

@@ -1,0 +1,25 @@
+﻿<Window x:Class="DiceSimulator.EdWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wpfAnimatedGif="http://wpfanimatedgif.codeplex.com"
+        Title="Ed says..." Height="300" Width="300"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow">
+
+    <Grid Background="Black">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- Animated GIF -->
+            <Image x:Name="edGif" Width="150" Height="150" Margin="10"/>
+
+            <!-- Kommentar -->
+            <TextBlock x:Name="edCommentText" 
+                       Text="Ed's comment will appear here..."
+                       Foreground="White"
+                       FontSize="14"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       Margin="10"/>
+        </StackPanel>
+    </Grid>
+</Window>

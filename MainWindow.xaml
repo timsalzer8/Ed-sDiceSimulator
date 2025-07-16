@@ -1,0 +1,31 @@
+﻿<Window x:Class="DiceSimulator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DiceSimulator"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <!-- Hauptbereich des Fensters mit Hintergrundfarbe -->
+    <Grid Background="DarkSlateGray">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
+            <!-- Auswahlfeld für Würfeltyp -->
+            <ComboBox x:Name="diceTypeComboBox" Width="150" FontSize="16" SelectedIndex="5" Margin="0,0,0,10">
+                <ComboBoxItem>D4</ComboBoxItem>
+                <ComboBoxItem>D6</ComboBoxItem>
+                <ComboBoxItem>D8</ComboBoxItem>
+                <ComboBoxItem>D10</ComboBoxItem>
+                <ComboBoxItem>D12</ComboBoxItem>
+                <ComboBoxItem>D20</ComboBoxItem>
+                <ComboBoxItem>D100</ComboBoxItem>
+            </ComboBox>
+
+            <!-- Würfeln-Button -->
+            <Button x:Name="rollButton" Content="roll dice" Width="150" Height="50" FontSize="16" Click="rollButton_Click"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>
