@@ -1,9 +1,12 @@
 ﻿<Application x:Class="DiceSimulator.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:DiceSimulator"
              StartupUri="MainWindow.xaml">
+
     <Application.Resources>
-         
+        <FontFamily x:Key="OldStyleFont">
+            pack://application:,,,/DiceSimulator;component/Assets/Fonts/#IM FELL DW Pica SC
+        </FontFamily>
+
     </Application.Resources>
 </Application>

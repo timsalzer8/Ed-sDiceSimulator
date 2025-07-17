@@ -5,13 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DiceSimulator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <!-- Hauptbereich des Fensters mit Hintergrundfarbe -->
-    <Grid Background="DarkSlateGray">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        Title="MainWindow"
+        Width="1076"
+        Height="717"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
 
-            <!-- Auswahlfeld für Würfeltyp -->
-            <ComboBox x:Name="diceTypeComboBox" Width="150" FontSize="16" SelectedIndex="5" Margin="0,0,0,10">
+    <Grid>
+        <!-- Hintergrundbild als echtes <Image> -->
+        <Grid.Background>
+            <ImageBrush ImageSource="pack://application:,,,/Assets/canyon.png"
+                Stretch="Fill"
+                AlignmentX="Center"
+                AlignmentY="Center"/>
+        </Grid.Background>
+
+        <!-- ... dein Canvas, Buttons, Würfel etc. ... -->
+
+        <!-- Die Würfel-Arena -->
+        <Canvas x:Name="diceCanvas" Grid.RowSpan="2">
+            <Image x:Name="diceImage"
+               Width="64" Height="64"
+               Canvas.Left="100" Canvas.Top="100"
+               Visibility="Hidden"/>
+        </Canvas>
+
+        <StackPanel x:Name="uiPanel"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Margin="0,202,0,0">
+
+            <!-- Auswahl der unterschiedlichen Würfel -->
+            <ComboBox x:Name="diceTypeComboBox" Width="150" FontSize="16" SelectedIndex="1" Margin="0,0,0,10">
                 <ComboBoxItem>D4</ComboBoxItem>
                 <ComboBoxItem>D6</ComboBoxItem>
                 <ComboBoxItem>D8</ComboBoxItem>
@@ -21,8 +46,43 @@
                 <ComboBoxItem>D100</ComboBoxItem>
             </ComboBox>
 
-            <!-- Würfeln-Button -->
-            <Button x:Name="rollButton" Content="roll dice" Width="150" Height="50" FontSize="16" Click="rollButton_Click"/>
+            <!-- WÜrfelbutton-->
+            <Button Width="280" Height="120"
+        Background="Transparent"
+        BorderThickness="0"
+        Cursor="Hand"
+        Click="rollButton_Click">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="12"
+                    ClipToBounds="True">
+                            <Grid>
+                                <!-- Dein Hintergrundbild als Button-Optik -->
+                                <Rectangle RadiusX="12" RadiusY="12">
+                                    <Rectangle.Fill>
+                                        <ImageBrush ImageSource="pack://application:,,,/DiceSimulator;component/Assets/rockbutton.png" Stretch="Fill"/>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- Eingravierte flackernde Schrift -->
+                                <TextBlock Text="Roll Dice"
+                                FontFamily="pack://application:,,,/DiceSimulator;component/Assets/Fonts/IMFellDWPicaSC-Regular.ttf#IM FELL DW Pica SC"
+                                Foreground="LightBlue"
+                                FontSize="50"
+                                FontWeight="Bold"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="Cyan"
+                          BlurRadius="10"
+                          ShadowDepth="0"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
+
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
 
         </StackPanel>
 
