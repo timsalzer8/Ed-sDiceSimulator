@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -24,7 +25,37 @@ namespace DiceSimulator
         public MainWindow()
         {
             InitializeComponent();
+
+            // Flacker-Animation
+            ColorAnimationUsingKeyFrames colorAnim = new ColorAnimationUsingKeyFrames();
+            colorAnim.AutoReverse = true;
+            colorAnim.RepeatBehavior = RepeatBehavior.Forever;
+            colorAnim.Duration = TimeSpan.FromSeconds(2);
+
+            // Flackernde Farbtöne (wie Feuer)
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFA500"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0))));    // Orange
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFD700"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(100))));  // Goldgelb
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FF4500"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200))));  // Feuerrot
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFFFFF"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300))));  // Hitzeblitz
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FF8C00"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(400))));  // Dunkelorange
+
+
+            // Brush aus Resource holen
+            var brush = (SolidColorBrush)this.FindResource("rollTextBrush");
+            brush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
+
+            // Optional: Schatteneffekt flackern lassen
+            DoubleAnimation blurAnim = new DoubleAnimation()
+            {
+                From = 5,
+                To = 18,
+                Duration = TimeSpan.FromMilliseconds(300),
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            glowEffect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, blurAnim);
         }
+
         // Wird ausgelöst, wenn der Button geklickt wird
         private void rollButton_Click(object sender, RoutedEventArgs e)
         {

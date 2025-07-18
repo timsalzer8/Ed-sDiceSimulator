@@ -10,6 +10,11 @@
         Height="717"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <!-- Flacker-Brush -->
+        <SolidColorBrush x:Key="rollTextBrush" Color="LightBlue" />
+    </Window.Resources>
 
     <Grid>
         <!-- Hintergrundbild als echtes <Image> -->
@@ -19,8 +24,6 @@
                 AlignmentX="Center"
                 AlignmentY="Center"/>
         </Grid.Background>
-
-        <!-- ... dein Canvas, Buttons, Würfel etc. ... -->
 
         <!-- Die Würfel-Arena -->
         <Canvas x:Name="diceCanvas" Grid.RowSpan="2">
@@ -47,43 +50,47 @@
             </ComboBox>
 
             <!-- WÜrfelbutton-->
-            <Button Width="280" Height="120"
+            <Button x:Name="rollButton"
+        Width="280"
+        Height="120"
+        Padding="0"
         Background="Transparent"
         BorderThickness="0"
         Cursor="Hand"
         Click="rollButton_Click">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="12"
-                    ClipToBounds="True">
-                            <Grid>
-                                <!-- Dein Hintergrundbild als Button-Optik -->
-                                <Rectangle RadiusX="12" RadiusY="12">
-                                    <Rectangle.Fill>
-                                        <ImageBrush ImageSource="pack://application:,,,/DiceSimulator;component/Assets/rockbutton.png" Stretch="Fill"/>
-                                    </Rectangle.Fill>
-                                </Rectangle>
-                                <!-- Eingravierte flackernde Schrift -->
-                                <TextBlock Text="Roll Dice"
-                                FontFamily="pack://application:,,,/DiceSimulator;component/Assets/Fonts/IMFellDWPicaSC-Regular.ttf#IM FELL DW Pica SC"
-                                Foreground="LightBlue"
-                                FontSize="50"
-                                FontWeight="Bold"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect Color="Cyan"
-                          BlurRadius="10"
-                          ShadowDepth="0"/>
-                                    </TextBlock.Effect>
-                                </TextBlock>
 
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
+                <!-- Clip auf abgerundetes Rechteck setzen -->
+                <Button.Clip>
+                    <RectangleGeometry RadiusX="12" RadiusY="12" Rect="0,0,280,120"/>
+                </Button.Clip>
+
+                <!-- Hintergrundbild im vollen Buttonbereich -->
+                <Border Width="280"
+            Height="120">
+                    <Border.Background>
+                        <ImageBrush ImageSource="pack://application:,,,/DiceSimulator;component/Assets/rockbutton.png"
+                        Stretch="Fill"/>
+                    </Border.Background>
+
+                    <!-- Flackernde Schrift -->
+                    <TextBlock x:Name="rollDiceText"
+                   Text="Roll Dice"
+                   FontSize="50"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontFamily="pack://application:,,,/DiceSimulator;component/Assets/Fonts/IMFellDWPicaSC-Regular.ttf#IM FELL DW Pica SC"
+                   Foreground="{DynamicResource rollTextBrush}">
+                        <TextBlock.Effect>
+                            <DropShadowEffect x:Name="glowEffect"
+                                  Color="OrangeRed"
+                                  BlurRadius="10"
+                                  ShadowDepth="0"
+                                  Opacity="1"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </Border>
             </Button>
-
         </StackPanel>
 
     </Grid>
