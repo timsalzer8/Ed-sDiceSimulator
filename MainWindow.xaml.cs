@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -22,39 +24,177 @@ namespace DiceSimulator
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            // Flacker-Animation
-            ColorAnimationUsingKeyFrames colorAnim = new ColorAnimationUsingKeyFrames();
-            colorAnim.AutoReverse = true;
-            colorAnim.RepeatBehavior = RepeatBehavior.Forever;
-            colorAnim.Duration = TimeSpan.FromSeconds(2);
-
-            // Flackernde Farbtöne (wie Feuer)
-            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFA500"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0))));    // Orange
-            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFD700"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(100))));  // Goldgelb
-            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FF4500"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200))));  // Feuerrot
-            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFFFFF"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300))));  // Hitzeblitz
-            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FF8C00"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(400))));  // Dunkelorange
-
-
-            // Brush aus Resource holen
-            var brush = (SolidColorBrush)this.FindResource("rollTextBrush");
-            brush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
-
-            // Optional: Schatteneffekt flackern lassen
-            DoubleAnimation blurAnim = new DoubleAnimation()
+            public MainWindow()
             {
-                From = 5,
-                To = 18,
-                Duration = TimeSpan.FromMilliseconds(300),
-                AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever
-            };
-            glowEffect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, blurAnim);
+            InitializeComponent();
+            this.Loaded += MainWindow_Loaded;
+            var rollBrush = (SolidColorBrush)this.FindResource("rollTextBrush");
+            var arrowBrush = (SolidColorBrush)this.FindResource("arrowFlameBrush");
+
+            StartSharedFlameAnimation(rollBrush);
+            StartSharedFlameAnimation(arrowBrush);
+
+                DoubleAnimation blurAnim = new DoubleAnimation()
+                {
+                    From = 5,
+                    To = 18,
+                    Duration = TimeSpan.FromMilliseconds(300),
+                    AutoReverse = true,
+                    RepeatBehavior = RepeatBehavior.Forever
+                };
+                glowEffect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, blurAnim);
+
         }
+
+        // Ganz unten in deiner Klasse MainWindow
+        private CancellationTokenSource flameCancel;
+
+        private Path arrowPath;
+
+        private void diceTypeComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (diceTypeComboBox.Template.FindName("ToggleButton", diceTypeComboBox) is ToggleButton toggleButton)
+            {
+                toggleButton.ApplyTemplate();
+
+                if (toggleButton.Template.FindName("arrowPath", toggleButton) is Path arrow)
+                {
+                    arrowPath = arrow;
+                }
+            }
+        }
+
+
+        private void ArrowPath_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (flameCancel != null)
+            {
+                flameCancel.Cancel();
+                flameCancel = null;
+            }
+
+            flameCancel = new CancellationTokenSource();
+            var brush = (SolidColorBrush)this.FindResource("arrowFlameBrush");
+            StartFlameLoop(brush, flameCancel.Token);
+        }
+
+        private void ArrowPath_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (flameCancel != null)
+            {
+                flameCancel.Cancel();
+                flameCancel = null;
+            }
+
+            var brush = (SolidColorBrush)this.FindResource("arrowFlameBrush");
+            ResetFlameBrush(brush, "#33221a");
+        }
+
+        public void StartFlameLoop(SolidColorBrush brush, CancellationToken token)
+        {
+            Task.Run(async () =>
+            {
+                string[] flameColors = new string[]
+                {
+            "#FF8C00", "#FFA500", "#FFD700", "#FF4500", "#FFFFFF"
+                };
+
+                while (!token.IsCancellationRequested)
+                {
+                    string hex = flameColors[flameRandom.Next(flameColors.Length)];
+
+                    if (hex == "#FFFFFF" && flameRandom.NextDouble() > 0.2)
+                        continue;
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        var anim = new ColorAnimation()
+                        {
+                            To = (Color)ColorConverter.ConvertFromString(hex),
+                            Duration = TimeSpan.FromMilliseconds(flameRandom.Next(100, 280)),
+                            FillBehavior = FillBehavior.HoldEnd
+                        };
+                        brush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
+                    });
+
+                    await Task.Delay(flameRandom.Next(80, 200));
+                }
+            });
+        }
+
+
+        private readonly Random flameRandom = new Random();
+
+        public async void TriggerFlameFlicker(SolidColorBrush brush)
+        {
+            string[] flameColors = new string[]
+            {
+        "#FF8C00", // Dark Orange
+        "#FFA500", // Orange
+        "#FFD700", // Gold
+        "#FF4500", // Fire Red
+        "#FFFFFF"  // Weiß (selten)
+            };
+
+            for (int i = 0; i < flameRandom.Next(3, 6); i++)
+            {
+                string hex = flameColors[flameRandom.Next(flameColors.Length)];
+
+                // Weiß nur selten verwenden
+                if (hex == "#FFFFFF" && flameRandom.NextDouble() > 0.1)
+                    hex = flameColors[flameRandom.Next(0, flameColors.Length - 1)];
+
+                var anim = new ColorAnimation()
+                {
+                    To = (Color)ColorConverter.ConvertFromString(hex),
+                    Duration = TimeSpan.FromMilliseconds(flameRandom.Next(90, 180)),
+                    FillBehavior = FillBehavior.HoldEnd
+                };
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    brush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
+                });
+
+                await Task.Delay(flameRandom.Next(80, 200));
+            }
+
+            // Nach dem Flackern wieder zur Grundfarbe
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                ResetFlameBrush(brush, "#FF8C00");
+            });
+        }
+
+        public void ResetFlameBrush(SolidColorBrush brush, string fallbackHex)
+            {
+                ColorAnimation resetAnim = new ColorAnimation()
+                {
+                    To = (Color)ColorConverter.ConvertFromString(fallbackHex),
+                    Duration = TimeSpan.FromMilliseconds(100)
+                };
+
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, resetAnim);
+            }
+
+        private void StartSharedFlameAnimation(SolidColorBrush brush)
+        {
+            var colorAnim = new ColorAnimationUsingKeyFrames
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever,
+                Duration = TimeSpan.FromSeconds(2)
+            };
+
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFA500"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0))));
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFD700"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(100))));
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FF4500"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200))));
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FFFFFF"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300))));
+            colorAnim.KeyFrames.Add(new LinearColorKeyFrame((Color)ColorConverter.ConvertFromString("#FF8C00"), KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(400))));
+
+            brush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
+        }
+
 
         // Wird ausgelöst, wenn der Button geklickt wird
         private void rollButton_Click(object sender, RoutedEventArgs e)
@@ -155,6 +295,20 @@ namespace DiceSimulator
 
             storyboard.Begin();
         }
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            var toggleButton = (ToggleButton)diceTypeComboBox.Template.FindName("ToggleButton", diceTypeComboBox);
+            if (toggleButton != null)
+            {
+                toggleButton.ApplyTemplate();
+                arrowPath = (Path)toggleButton.Template.FindName("arrowPath", toggleButton);
 
+                if (arrowPath != null)
+                {
+                    var arrowBrush = (SolidColorBrush)this.FindResource("arrowFlameBrush");
+                    arrowPath.Fill = arrowBrush;
+                }
+            }
+        }
     }
 }

@@ -10,10 +10,92 @@
         Height="717"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
-    
+
     <Window.Resources>
         <!-- Flacker-Brush -->
-        <SolidColorBrush x:Key="rollTextBrush" Color="LightBlue" />
+        <SolidColorBrush x:Key="rollTextBrush" Color="#33221a" />
+
+        <SolidColorBrush x:Key="arrowFlameBrush" Color="#33221a" />
+
+        <!-- ComboBox Style -->
+        <Style x:Key="FancyComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontFamily" Value="{StaticResource OldStyleFont}"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border CornerRadius="10"
+                                BorderBrush="Gray"
+                                BorderThickness="1">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="pack://application:,,,/DiceSimulator;component/Assets/rockbutton.png"
+                                            Stretch="Fill"/>
+                                </Border.Background>
+                                <ContentPresenter Margin="10,0,35,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              RecognizesAccessKey="True"/>
+                            </Border>
+
+                            <ToggleButton x:Name="ToggleButton"
+              Focusable="False"
+              ClickMode="Press"
+              Background="Transparent"
+              BorderThickness="0"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              Width="20"
+              Height="20"
+              Margin="0,0,10,0"
+              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Grid>
+                                            <Path x:Name="arrowPath"
+                                              Data="M 0 0 L 4 4 L 8 0 Z"
+                                              Stretch="Uniform"
+                                              Fill="{DynamicResource arrowFlameBrush}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              MouseEnter="ArrowPath_MouseEnter"
+                                              MouseLeave="ArrowPath_MouseLeave"/>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- DROPDOWN MENU -->
+                            <Popup Name="Popup"
+                               Placement="Bottom"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               PopupAnimation="Fade">
+                                <Border Margin="0,5,0,0"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="pack://application:,,,/DiceSimulator;component/Assets/rockbutton.png"
+                                         Stretch="Fill"/>
+                                    </Border.Background>
+
+                                    <ScrollViewer Margin="2"
+                                        SnapsToDevicePixels="True"
+                                        MaxHeight="200">
+                                        <StackPanel>
+                                            <ItemsPresenter />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -39,7 +121,13 @@
             Margin="0,202,0,0">
 
             <!-- Auswahl der unterschiedlichen Würfel -->
-            <ComboBox x:Name="diceTypeComboBox" Width="150" FontSize="16" SelectedIndex="1" Margin="0,0,0,10">
+            <ComboBox Style="{StaticResource FancyComboBoxStyle}"
+              x:Name="diceTypeComboBox"
+              Width="150"
+              FontSize="16"
+              SelectedIndex="1"
+              Margin="0,0,0,10"
+              Loaded="diceTypeComboBox_Loaded">
                 <ComboBoxItem>D4</ComboBoxItem>
                 <ComboBoxItem>D6</ComboBoxItem>
                 <ComboBoxItem>D8</ComboBoxItem>
